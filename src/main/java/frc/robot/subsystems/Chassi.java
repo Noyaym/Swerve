@@ -111,7 +111,7 @@ public class Chassi extends SubsystemBase {
     public double getJoystickAngle (Joystick j) {
         double y = j.getY();
         double x = j.getX();
-        double angle  = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        double angle  = Math.atan(y/x);
         double val;
         if ((angle<Constants.Buttons.j_RANGE) && (angle>-Constants.Buttons.j_RANGE)) {
             val=0.0;
