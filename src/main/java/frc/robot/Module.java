@@ -21,7 +21,6 @@ public class Module implements Sendable {
     private final TalonFX mAngle;
     private final CANCoder CAN;
     private final SimpleMotorFeedforward ff;
-    private boolean isCalibrated;
 
     public Module(boolean isC, int CAN, int vel, int angle) {
         this.mVel = new TalonFX(vel);
@@ -66,7 +65,13 @@ public class Module implements Sendable {
         DemandType.ArbitraryFeedForward, ff.calculate(v));
     }
 
+    public void setReversed(double a) {
+        if (a-getAngle()>0) {mAngle.setInverted(false);}
+        else {mAngle.setInverted(true);}
+    }
+
     public void setAngle(double a) {
+        setReversed(a);
         mAngle.set(ControlMode.Position, a*Constants.ModuleConst.PULSE_PER_ANGLE);
     }
 

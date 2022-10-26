@@ -20,7 +20,7 @@ import frc.robot.Module;
 import frc.robot.RobotContainer;
 import frc.robot.Constants;
 
-public class Chassi extends SubsystemBase {
+public class Chassis extends SubsystemBase {
 
     private final Module m1;
     private final Module m2;
@@ -30,9 +30,10 @@ public class Chassi extends SubsystemBase {
     private final SwerveDriveKinematics swerveK;
     private SwerveDriveOdometry swerveOd;
     private final PIDController PIDangle2radPerSec;
+    Field2d f2d;
 
 
-    public Chassi() {
+    public Chassis() {
         m1 = new Module(false, Constants.ModuleConst.CAN_PORT_NUM1,
         Constants.ModuleConst.mVel_PORT_NUM1, Constants.ModuleConst.mAngle_PORT_NUM1);
 
@@ -50,14 +51,17 @@ public class Chassi extends SubsystemBase {
         PIDangle2radPerSec = new PIDController(Constants.ChassiConst.a2r_Kp,
         Constants.ChassiConst.a2r_Ki, Constants.ChassiConst.a2r_Kd);
 
-        swerveOd = new SwerveDriveOdometry(swerveK, getRotation2d(getJyroPosition(RobotContainer.getJyro())));
+        swerveOd = new SwerveDriveOdometry(swerveK, getRotation2d(getJyroPosition(RobotContainer.getGyro())));
+        f2d = new Field2d();
+
+        SmartDashboard.putData("Field", getField2d());
 
     }
 
     public SwerveModuleState[] getSwerveState(double vx, double vy, double desiredAngle) {
-        double dif = desiredAngle - getJyroPosition(RobotContainer.getJyro());
+        double dif = desiredAngle - getJyroPosition(RobotContainer.getGyro());
         double radPerSec = PIDangle2radPerSec.calculate(dif);
-        return getModuleStates(vx, vy, radPerSec, getRotation2d(getJyroPosition(RobotContainer.getJyro())));
+        return getModuleStates(vx, vy, radPerSec, getRotation2d(getJyroPosition(RobotContainer.getGyro())));
 
     }
 
@@ -66,7 +70,7 @@ public class Chassi extends SubsystemBase {
         ChassisSpeeds cspeeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, radPerSec, angle);
         SwerveModuleState[] sms = swerveK.toSwerveModuleStates(cspeeds);
         for (int i=0; i<4; i++) {
-            sms[i] = SwerveModuleState.optimize(sms[i], angle);
+            sms[i] = SwerveModuleState.optimize(sms[i], angle); ///this is NOT correct
         }
         return sms;
     }
@@ -74,8 +78,8 @@ public class Chassi extends SubsystemBase {
 
 
 
-    public double getJyroPosition (PigeonIMU jyro) {
-        return jyro.getFusedHeading();
+    public double getJyroPosition (PigeonIMU gyro) {
+        return gyro.getFusedHeading();
     }
 
     public Rotation2d getRotation2d(double angle) {
@@ -145,15 +149,21 @@ public class Chassi extends SubsystemBase {
     }
 
     public Field2d getField2d() {
-        Field2d f2d = new Field2d();
-        f2d.setRobotPose(getPose2d());
         return f2d;
     }
 
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        SmartDashboard.putData("Field", getField2d());
+        double vx = getJoystickX(RobotContainer.getJoystickXY());
+        double vy = getJoystickY(RobotContainer.getJoystickXY());
+        double ang = getJoystickAngle(RobotContainer.getJoystickDirection());
+        SwerveModuleState[] sms = getSwerveState(vx, vy, ang);
+        swerveOd.update(getRotation2d(getJyroPosition(RobotContainer.getGyro())), sms);
+        f2d.setRobotPose(getPose2d());
+        
+        
+        
     }
 
 

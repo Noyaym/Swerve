@@ -56,14 +56,14 @@ public class RobotContainer {
   private final Module1 module;
   private static Joystick joystickxy;
   private static Joystick joystickDirection;
-  private static PigeonIMU jyro;
+  private static PigeonIMU gyro;
 
   private RobotContainer() {
     me = this;
     module = new Module1();
     joystickDirection = new Joystick(Constants.Buttons.joystickDirections_PORT_NUM);
     joystickxy = new Joystick(Constants.Buttons.joystickxy_PORT_NUM);
-    jyro = new PigeonIMU(Constants.ChassiConst.jyro_PORT_NUM);
+    gyro = new PigeonIMU(Constants.ChassiConst.jyro_PORT_NUM);
   }
 
   public RobotContainer getRobotContainer() {
@@ -74,8 +74,8 @@ public class RobotContainer {
     return me;
   }
 
-  public static PigeonIMU getJyro() {
-    return jyro;
+  public static PigeonIMU getGyro() {
+    return gyro;
   }
 
   public static Joystick getJoystickXY() {

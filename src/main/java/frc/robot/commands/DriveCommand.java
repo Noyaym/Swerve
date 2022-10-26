@@ -4,13 +4,13 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.ChassiConst;
-import frc.robot.subsystems.Chassi;
+import frc.robot.subsystems.Chassis;
 
 public class DriveCommand extends CommandBase {
 
-    private Chassi ch;
+    private Chassis ch;
 
-    public DriveCommand(Chassi ch) {
+    public DriveCommand(Chassis ch) {
         this.ch = ch;
         addRequirements(ch);
     }
