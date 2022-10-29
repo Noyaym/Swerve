@@ -30,7 +30,8 @@ public class Chassis extends SubsystemBase {
     private final SwerveDriveKinematics swerveK;
     private SwerveDriveOdometry swerveOd;
     private final PIDController PIDangle2radPerSec;
-    Field2d f2d;
+    private Field2d f2d;
+
 
 
     public Chassis() {
@@ -73,6 +74,17 @@ public class Chassis extends SubsystemBase {
             sms[i] = SwerveModuleState.optimize(sms[i], angle); ///this is NOT correct
         }
         return sms;
+    }
+
+    public SwerveModuleState[] getCurrentModuleStates() {
+        SwerveModuleState[] sModuleStates = new SwerveModuleState[4];
+        sModuleStates[1] = new SwerveModuleState(m1.getVel(), new Rotation2d(m1.getAngle()));
+        sModuleStates[2] = new SwerveModuleState(m2.getVel(), new Rotation2d(m2.getAngle()));
+        sModuleStates[3] = new SwerveModuleState(m3.getVel(), new Rotation2d(m3.getAngle()));
+        sModuleStates[4] = new SwerveModuleState(m4.getVel(), new Rotation2d(m4.getAngle()));
+        return sModuleStates;
+
+        
     }
 
 
@@ -154,17 +166,18 @@ public class Chassis extends SubsystemBase {
 
 
     @Override
-    public void initSendable(SendableBuilder builder) {
-        double vx = getJoystickX(RobotContainer.getJoystickXY());
-        double vy = getJoystickY(RobotContainer.getJoystickXY());
-        double ang = getJoystickAngle(RobotContainer.getJoystickDirection());
-        SwerveModuleState[] sms = getSwerveState(vx, vy, ang);
+    public void periodic() {  
+        SwerveModuleState[] sms = getCurrentModuleStates();
         swerveOd.update(getRotation2d(getJyroPosition(RobotContainer.getGyro())), sms);
         f2d.setRobotPose(getPose2d());
         
-        
-        
     }
+
+    
+    
+    
+
+    
 
 
 
